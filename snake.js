@@ -4,6 +4,7 @@ var ctx = canvas.getContext("2d");
 var frame = 1000 / 20;
 var count = 0;
 var dead = false;
+var keyPressed = [];
 
 class Apple {
   constructor() {
@@ -116,6 +117,7 @@ setInterval( () => {
   } else{
     drawDeadStatus();
   }
+  keyPressed = [];
 }, frame )
 
 var clearCanvas = () => {
@@ -139,8 +141,8 @@ var draw = () => {
 }
 
 var drawSnake = () => {
-  snake.tail.forEach((tail) => {
-    ctx.fillStyle = "#FFFFFF";
+  snake.tail.forEach((tail, tailNo) => {
+    ctx.fillStyle = ( tailNo == 0 ? "#FFFF00" : "#FFFFFF");
     ctx.fillRect(tail.x, tail.y, snake.width - 2, snake.height - 2);
   });
 }
@@ -169,25 +171,29 @@ var drawDeadStatus = () => {
   ctx.fillText(deadText, 200, 540);
 }
 
-document.addEventListener("keydown", (event)=>{
+document.addEventListener("keydown", async (event)=>{
   if (!dead) {
-    if (event.code == "ArrowLeft" && snake.rotateX == 0) {
-      snake.rotateX = -1;
-      snake.rotateY = 0;
-    } else if (event.code == "ArrowUp" && snake.rotateY == 0) {
-      snake.rotateX = 0;
-      snake.rotateY = -1;
-    } else if (event.code == "ArrowRight" && snake.rotateX == 0) {
-      snake.rotateX = 1;
-      snake.rotateY = 0;
-    } else if (event.code == "ArrowDown" && snake.rotateY == 0) {
-      snake.rotateX = 0;
-      snake.rotateY = 1;
+    if(!keyPressed.length){
+      if (event.code == "ArrowLeft" && snake.rotateX == 0) {
+        snake.rotateX = -1;
+        snake.rotateY = 0;
+      } else if (event.code == "ArrowUp" && snake.rotateY == 0) {
+        snake.rotateX = 0;
+        snake.rotateY = -1;
+      } else if (event.code == "ArrowRight" && snake.rotateX == 0) {
+        snake.rotateX = 1;
+        snake.rotateY = 0;
+      } else if (event.code == "ArrowDown" && snake.rotateY == 0) {
+        snake.rotateX = 0;
+        snake.rotateY = 1;
+      }
+      keyPressed.push(event.code);
+    } else {
+      console.log("Multiple Key Pressed Detected");
     }
   } else {
     dead = false;
     snake.spawn();
     apple.spawn(snake);
   }
-
 });
