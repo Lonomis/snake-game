@@ -3,6 +3,7 @@ var ctx = canvas.getContext("2d");
 
 var frame = 1000 / 20;
 var count = 0;
+var dead = false;
 
 class Apple {
   constructor() {
@@ -108,9 +109,13 @@ var apple = new Apple();
 apple.spawn(snake);
 
 setInterval( () => {
-  clearCanvas();
-  update();
-  draw();
+  if(!dead){
+    clearCanvas();
+    update();
+    draw();
+  } else{
+    drawDeadStatus();
+  }
 }, frame )
 
 var clearCanvas = () => {
@@ -121,8 +126,7 @@ var update = () => {
   snake.move();
 
   if (snake.isTouchSelf()){
-    snake.spawn();
-    apple.spawn(snake);
+    dead = true;
   }
 
   snake.eatApple(apple);
@@ -157,18 +161,33 @@ var drawScoreBoard = () => {
   ctx.fillText(scoreText, 0, 540);
 }
 
+var drawDeadStatus = () => {
+  var deadText = "Dead, press any key to restart.";
+
+  ctx.fillStyle = "#FF0000";
+  ctx.font = "20px sans-serif";
+  ctx.fillText(deadText, 200, 540);
+}
+
 document.addEventListener("keydown", (event)=>{
-  if (event.code == "ArrowLeft" && snake.rotateX == 0) {
-    snake.rotateX = -1;
-    snake.rotateY = 0;
-  } else if (event.code == "ArrowUp" && snake.rotateY == 0) {
-    snake.rotateX = 0;
-    snake.rotateY = -1;
-  } else if (event.code == "ArrowRight" && snake.rotateX == 0) {
-    snake.rotateX = 1;
-    snake.rotateY = 0;
-  } else if (event.code == "ArrowDown" && snake.rotateY == 0) {
-    snake.rotateX = 0;
-    snake.rotateY = 1;
+  if (!dead) {
+    if (event.code == "ArrowLeft" && snake.rotateX == 0) {
+      snake.rotateX = -1;
+      snake.rotateY = 0;
+    } else if (event.code == "ArrowUp" && snake.rotateY == 0) {
+      snake.rotateX = 0;
+      snake.rotateY = -1;
+    } else if (event.code == "ArrowRight" && snake.rotateX == 0) {
+      snake.rotateX = 1;
+      snake.rotateY = 0;
+    } else if (event.code == "ArrowDown" && snake.rotateY == 0) {
+      snake.rotateX = 0;
+      snake.rotateY = 1;
+    }
+  } else {
+    dead = false;
+    snake.spawn();
+    apple.spawn(snake);
   }
+
 });
